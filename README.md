@@ -48,4 +48,7 @@ Start the Client
   cd frontend
   npm start
 ```
+## Made By
+
+- [@poudyalamit](https://github.com/poudyalamit)
 
