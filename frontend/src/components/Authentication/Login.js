@@ -1,14 +1,64 @@
 import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, VStack } from '@chakra-ui/react'
 import React, { useState } from 'react'
+import { useToast } from '@chakra-ui/react'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa'
+import axios from 'axios'
+import { useHistory } from 'react-router-dom'
+
 const Login = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [show, setShow] = useState(false);
+    const [loading,setLoading]=useState(false);
+    const toast =useToast();  
+    const history = useHistory();
+
     const handleClick = () => {
         setShow(!show);
     }
-    const submitHandler = () => { }
+    const submitHandler = async() => {
+        setLoading(true);
+        if(!(password,email)){
+          toast({
+            title:"Please Fill all the Credentials",
+            status:"warning",
+            duration:5000,
+            isClosable:true,
+            position:"top-right"
+          })
+          setLoading(false);
+          return;
+        }
+        try {
+          const config={
+            headers:{
+              "Content-Type":"application/json",
+            }
+          }
+          const {data}= await axios.post("/api/user/login",{email,password},
+          config);
+          toast({
+            title:"Login Successful",
+            status:"success",
+            duration:5000,
+            isClosable:true,
+            position:"top-right"
+          });
+          localStorage.setItem("userInfo",JSON.stringify(data));
+          setLoading(false);
+          history.push('/chats');
+    
+        } catch (error) {
+          toast({
+            title:"Error Occured!",
+            status:"error",
+            duration:5000,
+            isClosable:true,
+            position:"top-right"
+          })
+          setLoading(false);
+        }
+     }
 
     return (
         <VStack>
