@@ -3,18 +3,18 @@ const chats = require("./data/data");
 const app = express();
 const dotenv=require('dotenv');
 const ConnectToDB = require("./config/db");
+const User=require('./routes/User');
 dotenv.config();
 const port = process.env.port || 5000;
 ConnectToDB();
 
-app.get('/api/chat', (req, res) => {
-    res.send(chats);
-})
+app.use(express.json());
+app.use('/api/user',User)
 
-app.get("/api/chat/:id", (req, res) => {
-    const singleChat = chats.find((c) => c._id === req.params.id);
-    res.send(singleChat);
-})
+//from middleware
+app.use(notFound);
+app.use(errorHandler);
+
 app.listen(port, () => {
-    console.log(`Bolnuhos backend running on : http://localhost:${port}`)
+    console.log(`Bolnuhos backend running on http://localhost:${port}`)
 })

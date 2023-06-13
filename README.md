@@ -15,7 +15,7 @@ Bolnuhos is a Full Stack Chatting App that uses Socket.io for real time communic
 Clone the project
 
 ```bash
-  git clone [https://github.com/poudyalamit/Bolnuhos]
+  git clone https://github.com/poudyalamit/Bolnuhos
 ```
 
 Go to the project directory
