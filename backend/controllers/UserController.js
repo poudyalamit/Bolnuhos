@@ -59,7 +59,7 @@ const authUser = asyncHandler(async (req, res) => {
     }
 })
 
-// /api/users?search=amit
+// /api/users?search="name to be searched"
 const allUsers = asyncHandler(async (req, res) => {
     const keyword = req.query.search ? {
         $or: [
