@@ -18,7 +18,7 @@ const chat = mongoose.Schema(
         }
     },
     {
-        timeStamps: true
+        timestamps: true
     }
 )
 

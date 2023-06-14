@@ -10,7 +10,7 @@ const user = mongoose.Schema({
     },
 },
     {
-        timestamp: true
+        timestamps: true
     });
 
 user.methods.matchPassword = async function (enteredPassword) {

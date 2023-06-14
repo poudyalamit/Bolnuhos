@@ -9,6 +9,7 @@ const Login = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [show, setShow] = useState(false);
+    //eslint-disable-next-line
     const [loading,setLoading]=useState(false);
     const toast =useToast();  
     const history = useHistory();
