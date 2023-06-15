@@ -49,6 +49,6 @@ Start the Client
   npm start
 ```
 ## Made By
-
+This app is developed by Amit Poudyal. You can reach me by: - [@poudyalamit](https://www.linkedin.com/in/amit-poudyal)
 - [@poudyalamit](https://github.com/poudyalamit)
 
