@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, Input, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react';
+import { Avatar, Box, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, Input, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Spinner, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react';
 import React, { useState } from 'react'
 import { FaSearch } from 'react-icons/fa';
 import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons'
@@ -10,7 +10,7 @@ import ChatLoading from './ChatLoading';
 import UserListItem from '../UserAvatar/UserListItem';
 
 const SideDrawer = () => {
-    const { user, setSelectedChat } = ChatState();
+    const { user, setSelectedChat,chats,setChats } = ChatState();
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -67,6 +67,9 @@ const SideDrawer = () => {
             }
 
             const { data } = await axios.post(`/api/chat`, { userId }, config);
+
+            if(!chats.find((c)=> c._id === data._id)) setChats([data, ...chats])
+
             setSelectedChat(data);
             setLoadingChat(false);
             onClose();
@@ -90,7 +93,7 @@ const SideDrawer = () => {
                         <Text display={{ base: "none", md: "flex" }} px="4">Search User</Text>
                     </Button>
                 </Tooltip>
-                <Text fontSize="2xl" fontFamily="sans-serif" style={{ "color": "blue" }} >Bolnuhos</Text>
+                <Text fontSize="2xl" fontFamily="sans-serif" style={{ "color": "#1a1a8d" }} >Bolnuhos</Text>
                 <div>
                     <Menu>
                         <MenuButton p={1}> <BellIcon fontSize={"2xl"} /></MenuButton>
@@ -129,6 +132,7 @@ const SideDrawer = () => {
                             : searchResult?.map(user => (
                                 <UserListItem key={user._id} user={user} handleFunction={() => accessChat(user._id)} />
                             ))}
+                            {loadingChat && <Spinner ml="auto" display={"flex"}/>}
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>

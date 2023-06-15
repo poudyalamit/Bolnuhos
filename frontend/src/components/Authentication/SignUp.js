@@ -161,9 +161,9 @@ const SignUp = () => {
       </FormControl>
 
       <Button
-        colorScheme='blue'
+        color={"white"}
         w='100%'
-        style={{ marginTop: 15 }}
+        style={{ marginTop: 15, "background":"#1a1a8d" }}
         onClick={submitHandler}
         isLoading={loading} >Sign Up</Button>
     </VStack>
