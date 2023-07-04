@@ -34,26 +34,77 @@ const GroupChatModal = ({ children }) => {
 
 
         } catch (error) {
-
+            toast({
+                title: "Failed to Create the Chat!",
+                description: error.response.data,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
         }
     }
-    const handleSubmit = () => { }
-    const handleDelete = () => { }
-    
+    const handleSubmit = async () => {
+        if (!groupChatName || !selectedUsers) {
+            toast({
+                title: "Please fill all the feilds",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "top",
+            });
+            return;
+        }
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await axios.post('/api/chat/group',
+            {
+                name: groupChatName,
+                users: JSON.stringify(selectedUsers.map((u) => u._id))
+            }, config);
+            setChats([data, ...chats]);
+            onClose();
+            toast({
+                title: "New Group Chat Created!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+        } catch (error) {
+            toast({
+                title: "Failed to Create the Chat!",
+                description: error.response,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+        }
+    }
+
+    const handleDelete = (delUser) => {
+        setSelectedUsers(selectedUsers.filter(sel => sel._id !== delUser._id))
+    }
+
     const handleGroup = (userToAdd) => {
-        if(selectedUsers.includes(userToAdd)){
+        if (selectedUsers.includes(userToAdd)) {
             toast({
                 title: "User already added",
                 status: "warning",
                 duration: 5000,
                 isClosable: true,
                 position: "top",
-              });
-              return ;
+            });
+            return;
 
         }
-        setSelectedUsers([...selectedUsers,userToAdd])
-     }
+        setSelectedUsers([...selectedUsers, userToAdd])
+    }
     return (
         <>
             <span onClick={onOpen}>{children}</span>
@@ -63,11 +114,11 @@ const GroupChatModal = ({ children }) => {
                     <ModalHeader
                         fontSize="35px"
                         fontFamily="Work sans"
-                        d="flex"
+                        display="flex"
                         justifyContent="center">
                         Create Group Chat</ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody d="flex" flexDir="column" alignItems="center">
+                    <ModalBody display="flex" flexDir="column" alignItems="center">
                         <FormControl>
                             <Input
                                 placeholder="Chat Name"
@@ -81,11 +132,11 @@ const GroupChatModal = ({ children }) => {
                                 mb={1}
                                 onChange={(e) => handleSearch(e.target.value)}
                             />
-                        <Box w={"100%"} display={"flex"} flexWrap={"wrap"}>
-                        {/* render searched users */}
-                        {selectedUsers.map(u=>( 
-                            <UserBadgeItem key={user._id} user={u} handleFunction={()=> handleDelete(u)} />
-                            ))}
+                            <Box w={"100%"} display={"flex"} flexWrap={"wrap"}>
+                                {/* render searched users */}
+                                {selectedUsers.map(u => (
+                                    <UserBadgeItem key={u._id} user={u} handleFunction={() => handleDelete(u)} />
+                                ))}
                             </Box>
                             {loading ? <div>loading</div> : searchResult?.slice(0, 3).map(user => (
                                 <UserListItem key={user._id} user={user} handleFunction={() => handleGroup(user)} />
@@ -96,7 +147,7 @@ const GroupChatModal = ({ children }) => {
                     </ModalBody>
                     <ModalFooter>
                         <Button colorScheme='blue' onClick={handleSubmit}>
-                            Close
+                            Create Chat
                         </Button>
                     </ModalFooter>
                 </ModalContent>

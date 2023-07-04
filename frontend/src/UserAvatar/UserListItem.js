@@ -11,6 +11,7 @@ const UserListItem = ({ user, handleFunction }) => {
                 background: "#1a1a8d",
                 color: "white",
             }}
+            key={user._id}
             w="100%"
             d="flex"
             alignItems="center"
@@ -28,7 +29,7 @@ const UserListItem = ({ user, handleFunction }) => {
                 src={user.pic}
             />
             <Box>
-                <Text>{user.name}</Text>
+                <Text >{user.name}</Text>
                 <Text fontSize="xs">
                     <b>Email : </b>
                     {user.email}

@@ -7,9 +7,9 @@ import ChatLoading from './ChatLoading';
 import { getSender } from '../config/ChatLogics';
 import GroupChatModal from './GroupChatModal';
 
-const MyChats = () => {
+const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
-  const { user, setUser, setSelectedChat, selectedChat, chats, setChats } = ChatState();
+  const { user, setSelectedChat, selectedChat, chats, setChats } = ChatState();
   const toast = useToast();
 
   const fetchChats = async () => {
@@ -36,7 +36,7 @@ const MyChats = () => {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
-  }, [])
+  }, [fetchAgain])
   return (
     <Box
       display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
@@ -44,28 +44,34 @@ const MyChats = () => {
       alignItems="center"
       p={3}
       bg="white"
-      w={{ base: "100%", md: "31%" }}
+      width={{ base: "100%", md: "31%" }}
       borderRadius="lg"
       borderWidth="1px"
-      height={"88vh"}>
+    // h={"85vh"}
+    >
       <Box
         pb={3}
         px={3}
         fontSize={{ base: "28px", md: "30px" }}
-        fontFamily="sans-serif"
-        display={"flex"}
-        w="100%"
+        fontFamily="Work sans"
+        display="flex"
+        width="100%"
         justifyContent="space-between"
-        alignItems="center" >
+        alignItems="center"
+      >
         My Chats
         <GroupChatModal>
-        <Button display={"flex"} fontSize={{ base: "17px", md: "10px", lg: "17px" }} rightIcon={<AddIcon />}>
-          New Group Chat
-        </Button>
-      </GroupChatModal>
+          <Button
+            display="flex"
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
+            New Group Chat
+          </Button>
+        </GroupChatModal>
       </Box>
       <Box
-        d="flex"
+        display="flex"
         flexDir="column"
         p={3}
         bg="#F8F8F8"
@@ -88,7 +94,7 @@ const MyChats = () => {
                 key={chat._id}>
                 <Text>{!chat.isGroupChat ? (
                   getSender(loggedUser, chat.users)
-                  
+
                 ) : (chat.chatName)}</Text>
               </Box>
             ))};
