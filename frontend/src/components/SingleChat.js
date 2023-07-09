@@ -13,9 +13,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
 
     const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(false);
-
-    const { user, selectedChat, setSelectedChat, newMessage, setNewMessage } = ChatState();
+    const { user, selectedChat, setSelectedChat } = ChatState();
     const toast = useToast();
     const fetchMessages = async () => {
         if (!selectedChat) return;
@@ -28,6 +28,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
             setLoading(true);
             const { data } = await axios.get(`/api/message/${selectedChat._id}`, config)
+            setMessages(data);
             console.log(data)
             if(data){
                 setLoading(false)
@@ -43,13 +44,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             })
         }
     }
-
-    useEffect(() => {
-        fetchMessages()
-    }, [selectedChat])
-
-    const sendMessage = async (e) => {
-        if (e.key === "Enter" && newMessage) {
+    
+    
+    const sendMessage = async (event) => {
+        if (event.key === "Enter" && newMessage) {
             try {
                 const config = {
                     headers: {
@@ -77,10 +75,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
         }
     }
-
+    
     const typingHanlder = (e) => {
         setNewMessage(e.target.value);
     }
+    useEffect(() => {
+        fetchMessages();
+        // eslint-disable-next-line 
+    }, [selectedChat])
     return (
         <>
             {selectedChat ? <>

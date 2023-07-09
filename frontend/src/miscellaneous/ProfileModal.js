@@ -1,16 +1,15 @@
-import { Avatar, Button, IconButton, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react'
+import {  Avatar, Button, IconButton, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react'
 import React from 'react'
 
 const ProfileModal = ({ user, children }) => {
-
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   return (
     <>
       {children ? <span onClick={onOpen}>{children}</span>
         : <IconButton
           display={{ base: "flex" }}
-          icon={<Avatar name={user.name} />}
+
+          icon={<Avatar src={user.pic}/>}
           onClick={onOpen} />}
 
       <Modal size="lg" isOpen={isOpen} onClose={onClose} isCentered="true" >
