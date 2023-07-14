@@ -8,15 +8,28 @@ import UpdateGroupChatModal from '../miscellaneous/UpdateGroupChatModal';
 import axios from 'axios';
 import "./styles.css"
 import ScrollableChat from './ScrollableChat';
+import io from "socket.io-client"
+
+const ENDPOINT = "http://localhost:8080";
+var socket , selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-
-
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const { user, selectedChat, setSelectedChat, chats } = ChatState();
+    const [socketConnected, setSocketConnected] = useState(false);
     const toast = useToast();
+
+
+    useEffect(()=>{
+        socket = io(ENDPOINT);
+        socket.emit("setup" ,user);
+        socket.on('connection',()=>{
+            setSocketConnected(true);
+        })
+    })
+    
     const fetchMessages = async () => {
         if (!selectedChat) return;
 
@@ -29,10 +42,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             setLoading(true);
             const { data } = await axios.get(`/api/message/${selectedChat._id}`, config)
             setMessages(data);
-            console.log(data)
-            if(data){
-                setLoading(false)
-            }
+            setLoading(false);
+            socket.emit('join chat', selectedChat._id);
+            
         } catch (error) {
             toast({
                 title: "Error Occured!",
@@ -44,7 +56,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             })
         }
     }
-    
+
     
     const sendMessage = async (event) => {
         if (event.key === "Enter" && newMessage) {
@@ -61,6 +73,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     content: newMessage,
                     chatId: selectedChat._id
                 }, config)
+                socket.emit('new message',data);
                 setMessages([...messages, data])
                 setLoading(false);
             } catch (error) {
@@ -76,13 +89,27 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         }
     }
     
+
     const typingHanlder = (e) => {
         setNewMessage(e.target.value);
     }
     useEffect(() => {
         fetchMessages();
+        selectedChatCompare = selectedChat;
         // eslint-disable-next-line 
     }, [selectedChat])
+
+    useEffect(()=>{
+        socket.on("Message recieved",(newMessageRecieved)=>{
+            if(!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id){
+            //give notification
+            }else{
+                setMessages([...messages,newMessageRecieved]);
+            }
+        });
+    })
+
+
     return (
         <>
             {selectedChat ? <>
