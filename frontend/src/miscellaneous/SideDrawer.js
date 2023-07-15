@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router';
 import axios from 'axios';
 import ChatLoading from './ChatLoading';
 import UserListItem from '../UserAvatar/UserListItem';
+import { getSender } from '../config/ChatLogics';
+import {  Badge } from 'antd';
 
 const SideDrawer = () => {
-    const { user, setSelectedChat,chats,setChats } = ChatState();
+    const { user, setSelectedChat, chats, setChats, notification, setNotification } = ChatState();
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -68,7 +70,7 @@ const SideDrawer = () => {
 
             const { data } = await axios.post(`/api/chat`, { userId }, config);
 
-            if(!chats.find((c)=> c._id === data._id)) setChats([data, ...chats])
+            if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats])
 
             setSelectedChat(data);
             setLoadingChat(false);
@@ -96,8 +98,21 @@ const SideDrawer = () => {
                 <Text fontSize="2xl" fontFamily="sans-serif" style={{ "color": "#1a1a8d" }} >Bolnuhos</Text>
                 <div>
                     <Menu>
-                        <MenuButton p={1}> <BellIcon fontSize={"2xl"} /></MenuButton>
-
+                        <MenuButton p={2}> 
+                        <Badge  count={notification.length} size='small'>
+                        <BellIcon fontSize={"2xl"} m={1} /></Badge></MenuButton>
+                        <MenuList pl={2}>
+                            {!notification.length && "No New Messages"}
+                            {notification.map(noti =>(
+                                <MenuItem key={noti._id} onClick={(()=> {
+                                    setSelectedChat(noti.chat)
+                                    setNotification(notification.filter((n)=> n !== noti))
+                                })}>
+                                    {noti.chat.isGroupChat ? `New Message in ${noti.chat.chatName}` 
+                                    : `New Message from ${getSender(user, noti.chat.users)}`}
+                                </MenuItem>
+                                ))}
+                        </MenuList>
                     </Menu>
                     <Menu>
                         <Menu>
@@ -132,7 +147,7 @@ const SideDrawer = () => {
                             : searchResult?.map(user => (
                                 <UserListItem key={user._id} user={user} handleFunction={() => accessChat(user._id)} />
                             ))}
-                            {loadingChat && <Spinner ml="auto" display={"flex"}/>}
+                        {loadingChat && <Spinner ml="auto" display={"flex"} />}
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>

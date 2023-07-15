@@ -19,31 +19,20 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const { user, selectedChat, setSelectedChat, chats } = ChatState();
+    const { user, selectedChat, setSelectedChat, chats, notification, setNotification } = ChatState();
     const [socketConnected, setSocketConnected] = useState(false);
     const [typing, setTyping] = useState(false);
     const [Istyping, setIsTyping] = useState(false);
     const toast = useToast();
 
-    const defaultOptions={
+    const defaultOptions = {
         loop: true,
         autoplay: true,
         animationData: animationData,
-        rendererSettings:{
+        rendererSettings: {
             preserveAspectRatio: "xMidYMid slice",
         },
     }
-
-
-    useEffect(() => {
-        socket = io(ENDPOINT);
-        socket.emit("setup", user);
-        socket.on('Connected', () => {
-            setSocketConnected(true);
-        })
-        socket.on('typing', () => setIsTyping(true))
-        socket.on('stop typing', () => setIsTyping(false))
-    })
 
     const fetchMessages = async () => {
         if (!selectedChat) return;
@@ -75,7 +64,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     const sendMessage = async (event) => {
         if (event.key === "Enter" && newMessage) {
-            socket.emit('stop typing',selectedChat._id)
+            socket.emit('stop typing', selectedChat._id)
             try {
                 const config = {
                     headers: {
@@ -104,7 +93,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
         }
     }
-
+    useEffect(() => {
+        socket = io(ENDPOINT);
+        socket.emit("setup", user);
+        socket.on('Connected', () => setSocketConnected(true))
+        socket.on('typing', () => setIsTyping(true))
+        socket.on('stop typing', () => setIsTyping(false))
+        // eslint-disable-next-line
+    }, [])
 
     useEffect(() => {
         fetchMessages();
@@ -116,11 +112,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket.on("Message recieved", (newMessageRecieved) => {
             if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
                 //give notification
+                if(!notification.includes(newMessageRecieved)){
+                    setNotification([newMessageRecieved, ...notification]);
+                    setFetchAgain(!fetchAgain);
+                }
             } else {
                 setMessages([...messages, newMessageRecieved]);
             }
         });
-    })
+    });
+
     const typingHanlder = (e) => {
         setNewMessage(e.target.value);
 
@@ -196,12 +197,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                         </div>
                     }
                     <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-                        {Istyping ? <div>
-                            <Lottie
-                            options={defaultOptions}
-                            width={70}
-                            style={{marginBottom: 15, marginLeft: 0}}/>
-                        </div> : <></>}
+                        {Istyping ? (
+                            <div>
+                                <Lottie
+                                    options={defaultOptions}
+                                    width={70}
+                                    style={{ marginTop: 10,marginBottom: 15, marginLeft: 0 }}
+                                />
+                            </div>
+                        ) : (<></>)}
                         <Input variant={"filled"} bg={"#E0E0E0"} placeholder='Enter a message...'
                             onChange={typingHanlder} value={newMessage} />
                     </FormControl>

@@ -54,10 +54,14 @@ io.on("connection", (socket) => {
 
         if (!chat.users) return console.log('chat.users not defined');
 
-        chat.users.forEach(user => {
+        chat.users.forEach((user) => {
             if (user._id === newMessageRecieved.sender._id) return;
 
             socket.in(user._id).emit("Message recieved", newMessageRecieved);
         })
+    })
+    socket.off('setup', () => {
+        console.log("User Disconnected");
+        socket.leave(userData._id);
     })
 })
